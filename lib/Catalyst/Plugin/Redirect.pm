@@ -2,9 +2,9 @@ package Catalyst::Plugin::Redirect;
 
 use strict;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-my($Revision) = '$Id: Redirect.pm,v 1.1.1.1 2005/11/18 20:13:23 Sho Exp $';
+my($Revision) = '$Id: Redirect.pm,v 1.4 2006/01/07 13:44:47 Sho Exp $';
 
 
 
@@ -35,7 +35,7 @@ Redirect for Catalyst used easily is offered.
 
 Basic URL of your application is returned.
 If your application is executed by "http://myhost/myapp/"
-it returns "/myapp" .
+it returns "/myapp/" .
 
 =back
 
@@ -44,7 +44,10 @@ it returns "/myapp" .
 sub get_baseurl {
     my $c = shift;
     my $base = $c->req->base;
-    $base =~ s!^\w+://$ENV{'HTTP_HOST'}!!;
+    my $host = $c->req->base->host;
+    my $port = $c->req->base->port;
+    $base =~ s!^https?://$host:$port!!;
+    $base =~ s!^https?://$host!!;
     return $base;
 }
 
@@ -71,7 +74,7 @@ sub redirect {
     if (@_) {
 	my $location = shift;
 	my $status   = shift || 302;
-	if ($location =~ m!^http(s):://!) {
+	if ($location =~ m!^https?://!) {
 	    return $c->res->redirect($location,$status);
 	} elsif ($location =~ m!^/!) {
 	    my $base = $c->get_baseurl;
@@ -84,13 +87,18 @@ sub redirect {
     }
 }
 
+=BUGS
+
+When Reverse Proxy is used, get_baseurl returns the backend server's base.
+For example, "/" will be returned when http://www.mydomain.com/myapp/ is a proxy for http://appserver.local.server/.
+
 =head1 SEE ALSO
 
 L<Catalyst>
 
 =head1 AUTHOR
 
-Shota Takayama, C<sho@bindstorm.jp>
+Shota Takayama, C<shot[atmark]bindstorm.jp>
 
 =head1 COPYRIGHT AND LICENSE
 

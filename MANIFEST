@@ -6,3 +6,4 @@ t/01use.t
 t/02pod.t
 t/03podcoverage.t
 lib/Catalyst/Plugin/Redirect.pm
+META.yml                                 Module meta-data (added by MakeMaker)
